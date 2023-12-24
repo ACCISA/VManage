@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import axios from 'axios'
-import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,9 +16,11 @@ function App() {
 
   return (
     <>
-      <button onClick={handleLaunchVM}>
-        Test Launch VM
-      </button>
+      <div className='flex justify-center content-center'>
+        <button onClick={handleLaunchVM} className='bg-red-500 p-4'>
+          Test Launch VM
+        </button>
+      </div>
     </>
   )
 }
