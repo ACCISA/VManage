@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react';
+import Add from './forms/Add';
 
 function App() {
 
@@ -112,17 +113,19 @@ function App() {
 
   return (
     <>
-      <div className='flex justify-center content-center'>
-        <h3 className='bg-red-500'>Add VM</h3>
-        <form onSubmit={handleAddVM} className='flex flex-col bg-red-500'>
+    <div className=''>test</div>
+      <div className=''>
+        <h3 className=''>Add VM</h3>
+        <Add/>
+        {/* <form onSubmit={handleAddVM} className=''>
           <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
           <input type="text" value={path} onChange={ev => setPath(ev.target.value)} />
           <input type="text" value={ip} onChange={ev => setIp(ev.target.value)} />
           <input type="submit" />
-        </form>
+        </form> */}
 
         <h3 className='bg-red-500'>Remove VM</h3>
-        <form onSubmit={handleRemoveVM} className='flex flex-col bg-red-500'>
+        <form onSubmit={handleRemoveVM} className=''>
           <input type="text" value={removeName} onChange={ev => setRemoveName(ev.target.value)} />
           <input type="submit" />
         </form>
