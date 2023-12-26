@@ -48,7 +48,7 @@ function App() {
           console.log(res_status.data.status);
           if (res_status.data.status == "Online") {
             is_online = true;
-            console.log("vm is online");
+            console.log("vm online");
           }
       })
       if (is_online) break;
