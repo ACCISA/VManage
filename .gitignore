@@ -7,3 +7,9 @@ client/postcss.config.js
 client/tailwind.config.js
 client/package.json
 client/yarn.lock
+client/.eslintrc.cjs
+client/vite.config.js
+client/yarn.lock
+client/.yarn/
+client/.yarnrc.yml
+venv/
