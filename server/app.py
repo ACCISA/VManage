@@ -39,19 +39,43 @@ async def post_setting(request: Request):
     global VMWARE_PATH
     try:
         data = await request.json()
-        if "vmware_path" not in data.keys(): return "Unknown Setting"
+        # TODO make this work for different settings
+        if "vmware_path" not in data.keys(): return {"status":"Unknown"}
 
         vmware_path = data.get("vmware_path")
-        if vmware_path is None: return "Invalid value for setting vmware_path"
+        if vmware_path is None: return {"status":"Invalid"}
 
         #store the setting somewhere
         VMWARE_PATH = vmware_path
-        
-        return "Setting Stored"
+        config = json.load(open("config.json"))
+        config["vmware_path"] = vmware_path
+        fw = open("config.json","w")
+        json.dump(config, fw)
+        return {"status":"Saved"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-@app.post("/")
+@app.post("/remove")
+async def post_remove(request: Request):
+    try:
+        data = await request.json()
+
+        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
+
+        name = data.get("name")
+
+        if name is None: raise HTTPException(status_code=422, detail="Name is required")
+
+        global machines
+        if name not in machines.keys(): return {"status":"Unknown"}
+
+        vm: VirtualMachine = machines[name]
+        vm.remove()        
+        del machines[name]
+        return {"status":"Removed"}
+
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 @app.post("/add")
 async def post_add(request: Request):
@@ -77,7 +101,7 @@ async def post_add(request: Request):
         machines[name] = vm
         
         print("Virutal machine started")
-
+        return {"status":"Added"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -140,8 +164,7 @@ async def post_stop(request: Request):
         vm: VirtualMachine = machines.get(name)
         vm.stop()
         del machines[name]
-        return f"vm {name} stoped"
-
+        return {"status":"Offline"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 

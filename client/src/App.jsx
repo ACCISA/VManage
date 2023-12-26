@@ -4,12 +4,15 @@ import { useState } from 'react';
 function App() {
 
   const [statusAPI, setStatusAPI] = useState("");
-  const [name, setName] = useState("VM Name");
-  const [path, setPath] = useState("VM Path");
-  const [ip, setIp] = useState("VM IP");
-  const [launchName, setLaunchName] = useState()
+  const [name, setName] = useState("test");
+  const [path, setPath] = useState("D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx");
+  const [ip, setIp] = useState("192.168.111.222");
+  const [launchName, setLaunchName] = useState("test");
+  const [vmPath, setVmPath] = useState("C:\\Program Files (x86)\\VMware\\VMware Player\\");
+  const [removeName, setRemoveName] = useState("test");
 
-  const handleLaunchVM = (ev) => {
+
+  const handleStartVM = (ev) => {
     ev.preventDefault();
     console.log("Attempting to launch VM");
     axios.post('http://localhost:8081/start',
@@ -26,6 +29,24 @@ function App() {
       handleTestSleep().then(() => {console.log("all done")});
     });
   }
+
+  const handleStopVM = (ev) => {
+    ev.preventDefault();
+    console.log("Attempting to launch VM");
+    axios.post('http://localhost:8081/stop',
+    {
+      "name": launchName
+    }, 
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res_start => {
+      console.log(res_start.data.status);
+    });
+  }
+
 
   const handleTestSleep = async () => {
     let value = 0;
@@ -66,13 +87,33 @@ function App() {
       "path":path,
       "ip":ip
     })
+  }
 
+  const handleRemoveVM = async (ev) => {
+    ev.preventDefault();
+    axios.post("http://localhost:8081/remove", {
+      "name":removeName
+    })
+    .then(res => {
+      console.log(res.data.status)
+    })
+  }
+
+  const handleSetting = async (ev) => {
+    ev.preventDefault();
+    axios.post("http://localhost:8081/setting",{
+      "vmware_path": vmPath
+    })
+    .then( res => {
+      console.log(res.data.status)
+      console.log("setting stored")
+    })
   }
 
   return (
     <>
       <div className='flex justify-center content-center'>
-        <h1 className='bg-red-500'>Add VM</h1>
+        <h3 className='bg-red-500'>Add VM</h3>
         <form onSubmit={handleAddVM} className='flex flex-col bg-red-500'>
           <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
           <input type="text" value={path} onChange={ev => setPath(ev.target.value)} />
@@ -80,8 +121,27 @@ function App() {
           <input type="submit" />
         </form>
 
-        <form onSubmit={handleLaunchVM}>
+        <h3 className='bg-red-500'>Remove VM</h3>
+        <form onSubmit={handleRemoveVM} className='flex flex-col bg-red-500'>
+          <input type="text" value={removeName} onChange={ev => setRemoveName(ev.target.value)} />
+          <input type="submit" />
+        </form>
+
+        <h3 className='bg-red-500'>Start VM</h3>
+        <form onSubmit={handleStartVM}>
           <input type="text" value={launchName} onChange={ev => setLaunchName(ev.target.value)} />
+          <input type="submit" />
+        </form>
+
+        <h3 className='bg-red-500'>Stop VM</h3>
+        <form onSubmit={handleStopVM}>
+          <input type="text" value={launchName} onChange={ev => setLaunchName(ev.target.value)} />
+          <input type="submit" />
+        </form>
+
+        <h3 className='bg-red-500'>Settings VM</h3>
+        <form onSubmit={handleSetting}>
+          <input type="text" value={vmPath} onChange={ev => setVmPath(ev.target.value)} />
           <input type="submit" />
         </form>
         

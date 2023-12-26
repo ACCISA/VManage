@@ -1,1 +1,1 @@
-{"vmware_path": "", "machines": {"VM Name": {"name": "VM Name", "ip": "VM IP", "path": "VM Path", "status": "Offline"}, "test": {"name": "test", "ip": "192.168.111.222", "path": "D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx", "status": "Online"}}}
+{"vmware_path": "", "machines": {"test": {"name": "test", "ip": "192.168.111.222", "path": "D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx", "status": "Offline"}}}

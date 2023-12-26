@@ -98,5 +98,12 @@ class VirtualMachine:
             print(f"Error code: {result.returncode}")
             print(f"Error: {result.stderr.strip()}")
 
+    def remove(self):
+        print("Removing vm")
+        data = json.load(open("config.json"))
+        del data["machines"][self.name]
+        fw = open("config.json","w")
+        json.dump(data, fw)
+
     def is_file(self):
         pass
