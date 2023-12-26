@@ -8,3 +8,9 @@ React app to manage vms
 3. npm install --global yarn
 4. yarn
 5. yarn dev
+
+## How to git
+1. git status
+2. git add <file>
+3. git commit -m "this is
+4. git push -u origin 
