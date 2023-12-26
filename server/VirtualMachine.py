@@ -4,7 +4,7 @@ import time
 import os
 import asyncio
 import json
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from typing import List, Dict
 from subprocess import Popen
 
@@ -16,7 +16,7 @@ class VM(BaseModel):
 
 class Config(BaseModel):
     vmware_path: str
-    machines: List[Dict]
+    machines: Dict
 
 class VirtualMachine:
 
@@ -30,18 +30,20 @@ class VirtualMachine:
         self.start_command = f'"{self.vmware_path}vmrun" start "{self.path}" nogui'
         self.stop_command = f'"{self.vmware_path}vmrun" stop "{self.path}"'
         self.ip = ip
-        self.config = Config(**json.load(open("config.json")))
+        try:
+            self.config = Config(**json.load(open("config.json")))
+        except ValidationError as e:
+            print(e)
         self.status = "Offline"
+        self.store()
 
     def store(self):
-        print(type(self.status), 'ss')
-        self.config.machines.append(dict(VM(name=self.name,ip=self.ip,path=self.path,status=self.status)))
+        self.config.machines[self.name] = dict(VM(name=self.name,ip=self.ip,path=self.path,status=self.status))
         self.update_config()
 
     def update_config(self):
         data = dict(self.config)
         fw = open(VirtualMachine.config_file, "w")
-        print(data)
         json.dump(data, fw)
         print("Config data updated")
 
@@ -86,7 +88,8 @@ class VirtualMachine:
     def stop(self):
         print("trying to stop vm")
         result = subprocess.run(self.stop_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        
+        del self.config.machines[self.name]
+        self.update_config()
         if result.returncode == 0:
             print("VM stoped")
             self.status = "Offline"

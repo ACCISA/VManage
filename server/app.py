@@ -46,7 +46,38 @@ async def post_setting(request: Request):
 
         #store the setting somewhere
         VMWARE_PATH = vmware_path
+        
         return "Setting Stored"
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+@app.post("/")
+
+@app.post("/add")
+async def post_add(request: Request):
+    try:
+        data = await request.json()
+        print(data)
+        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
+        if "path" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm path")
+        if "ip" not in data.keys(): raise HTTPException(status_code=422, detail="Missing ip")
+        
+        name = data.get("name")
+        path = data.get("path")
+        ip = data.get("ip")
+
+        if name is None: raise HTTPException(status_code=422, detail="Name is required")
+        if path is None: raise HTTPException(status_code=422, detail="Name is required")
+        if ip is None: raise HTTPException(status_code=422, detail="Name is required")
+
+        global VMWARE_PATH
+        global machines
+
+        vm = VirtualMachine(name,path,VMWARE_PATH,ip)
+        machines[name] = vm
+        
+        print("Virutal machine started")
+
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -77,24 +108,18 @@ async def create_item(request: Request):
         # TODO verify content
 
         if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
-        if "path" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm path")
-        if "ip" not in data.keys(): raise HTTPException(status_code=422, detail="Missing ip")
         
+        print("all data present")
         
         name = data.get("name")
-        path = data.get("path")
-        ip = data.get("ip")
 
         if name is None: raise HTTPException(status_code=422, detail="Name is required")
-        if path is None: raise HTTPException(status_code=422, detail="Name is required")
-        if ip is None: raise HTTPException(status_code=422, detail="Name is required")
         
-        global VMWARE_PATH
         global machines
-        vm: VirtualMachine = VirtualMachine(name,path,VMWARE_PATH,ip)  
+
+        if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"VM {name} not found")
+        vm = machines[name]
         task = asyncio.create_task(vm.start())
-        print("print ok")
-        machines[name] = vm
         return {"status":"started"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -131,7 +156,7 @@ def create_config_file():
     # Default configuration
     default_config = {
         'vmware_path': '',
-        'machines': [],
+        'machines': {},
     }
 
     # Create the config file with default configurations
