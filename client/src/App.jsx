@@ -1,5 +1,9 @@
 import axios from 'axios'
 import { useState } from 'react';
+import Header from './Header';
+import TestComponent from './Info';
+import './Test.css';
+
 
 function App() {
 
@@ -71,25 +75,9 @@ function App() {
 
   return (
     <>
-      <div className='flex justify-center content-center'>
-        <h1 className='bg-red-500'>Add VM</h1>
-        <form onSubmit={handleAddVM} className='flex flex-col bg-red-500'>
-          <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
-          <input type="text" value={path} onChange={ev => setPath(ev.target.value)} />
-          <input type="text" value={ip} onChange={ev => setIp(ev.target.value)} />
-          <input type="submit" />
-        </form>
-
-        <form onSubmit={handleLaunchVM}>
-          <input type="text" value={launchName} onChange={ev => setLaunchName(ev.target.value)} />
-          <input type="submit" />
-        </form>
-        
-        <button onClick={handleTestSleep}>
-          Test Sleep
-        </button>
-      </div>
-      <h1>{statusAPI}</h1>
+    <Header></Header>
+    <TestComponent></TestComponent>
+    <TestComponent></TestComponent>
     </>
   )
 }
