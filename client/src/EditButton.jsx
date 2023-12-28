@@ -4,7 +4,7 @@ import { FaEdit } from 'react-icons/fa'; // Import the edit icon from a library 
 const EditButton = ({ onClick }) => {
   return (
     <button className="edit-button" onClick={onClick}>
-      <FaEdit />  </button>
+     Edit <FaEdit className='ml-2' />  </button>
   );
 };
 
