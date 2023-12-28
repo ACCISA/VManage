@@ -1,13 +1,11 @@
 import axios from 'axios'
 import { useState } from 'react';
 import Add from './forms/Add';
+import Header from './Header';
 
 function App() {
 
   const [statusAPI, setStatusAPI] = useState("");
-  const [name, setName] = useState("test");
-  const [path, setPath] = useState("D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx");
-  const [ip, setIp] = useState("192.168.111.222");
   const [launchName, setLaunchName] = useState("test");
   const [vmPath, setVmPath] = useState("C:\\Program Files (x86)\\VMware\\VMware Player\\");
   const [removeName, setRemoveName] = useState("test");
@@ -81,15 +79,6 @@ function App() {
     }
   }
   
-  const handleAddVM = async (ev) => {
-    ev.preventDefault();
-    axios.post("http://localhost:8081/add", {
-      "name":name,
-      "path":path,
-      "ip":ip
-    })
-  }
-
   const handleRemoveVM = async (ev) => {
     ev.preventDefault();
     axios.post("http://localhost:8081/remove", {
@@ -113,10 +102,12 @@ function App() {
 
   return (
     <>
+
+      <Header></Header>
     <div className=''>test</div>
       <div className=''>
         <h3 className=''>Add VM</h3>
-        <Add/>
+        <Add name/>
         {/* <form onSubmit={handleAddVM} className=''>
           <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
           <input type="text" value={path} onChange={ev => setPath(ev.target.value)} />
