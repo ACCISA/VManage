@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useState } from 'react';
 import Header from './Header';
-import TestComponent from './Info';
+import VMComponent from './VMComponent';
 import './Test.css';
 
 
@@ -76,8 +76,8 @@ function App() {
   return (
     <>
     <Header></Header>
-    <TestComponent></TestComponent>
-    <TestComponent></TestComponent>
+    <VMComponent></VMComponent>
+    <VMComponent></VMComponent>
     </>
   )
 }

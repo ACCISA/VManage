@@ -4,7 +4,7 @@ import EditButton from './EditButton';
 import StartStopButton from './StartStopButton';
 
 
-const TestComponent = () => {
+const VMComponent = () => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleButtonClick = () => {
@@ -31,4 +31,4 @@ const TestComponent = () => {
   );
 };
 
-export default TestComponent;
+export default VMComponent;
