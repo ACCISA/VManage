@@ -27,12 +27,27 @@ app.add_middleware(
 
 
 
-@app.post("/")
-
 @app.post("/add")
 async def post_add(request: Request):
-    return {"status":"Added"}
+    try:
+        data = await request.json()
+        print(data)
+        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
+        if "path" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm path")
+        if "ip" not in data.keys(): raise HTTPException(status_code=422, detail="Missing ip")
+        
+        name = data.get("name")
+        path = data.get("path")
+        ip = data.get("ip")
 
+        if name is None: raise HTTPException(status_code=422, detail="Name is required")
+        if path is None: raise HTTPException(status_code=422, detail="Name is required")
+        if ip is None: raise HTTPException(status_code=422, detail="Name is required")
+
+        print(f"Virutal machine added {data}")
+        return {"status":"Added"}
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 @app.post("/status")
 async def post_status(request: Request):
@@ -42,6 +57,7 @@ async def post_status(request: Request):
         if loading: status = "Starting"
         if online: status = "Online"
 
+        print(status)
         return {"status": status}
 
     except Exception as e:
@@ -68,6 +84,7 @@ async def create_item(request: Request):
         global loading
         loading = True
         asyncio.create_task(start_loading())
+        print("trying to start machine")
         return {"status":"started"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -76,6 +93,10 @@ async def create_item(request: Request):
 
 @app.post("/stop")
 async def post_stop(request: Request):
+   global loading
+   loading = False
+   global online
+   online = False
    return {"status":"Stoped"}
 
 if __name__ == "__main__":
