@@ -19,11 +19,14 @@ const TestComponent = () => {
           <li>VM path</li>
           <li>VM IP address</li>
           <li>VM Operating System</li>
+          <li> <div className="btn" onClick={handleButtonClick}></div></li>
         </ul>
+        
         <EditButton></EditButton>
         <StartStopButton></StartStopButton>
-        <div className="btn" onClick={handleButtonClick}></div>
+        
       </div>
+     
     </div>
   );
 };

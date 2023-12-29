@@ -5,19 +5,18 @@ import { Button, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle }
 
 export default function Header() {
   return (
-    <Navbar className='nb bg-purple-500 mb-20' fluid rounded>
-    <Button className='started bg-black'>Get started</Button>
+    <Navbar className='nb bg-blacktext-3xl-500 mb-20' fluid rounded>
+    <Button className='started bg-black text-white font-semibold'>Add VM</Button>
       <NavbarBrand href="https://flowbite-react.com">
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white ml-80">VManage</span>
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white ml-80 text-white">VManage</span>
       </NavbarBrand>
       <div className="flex md:order-2">
         
         <NavbarToggle />
       </div>
-      <div className="settings-icon ml-80 text-2xl">
+      <div className="settings-icon ml-80 text-2xl text-white">
       <FaCog />
     </div>
-    <div className='add text-2xl'><IoIosAddCircle /></div>
 
     </Navbar>
   );
