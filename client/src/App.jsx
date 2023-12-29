@@ -2,7 +2,6 @@ import axios from 'axios'
 import { useState } from 'react';
 import Header from './Header';
 import VMComponent from './VMComponent';
-import './Test.css';
 
 
 function App() {
@@ -74,11 +73,11 @@ function App() {
   }
 
   return (
-    <>
+    <div className=''>
     <Header></Header>
-    <VMComponent></VMComponent>
-    <VMComponent></VMComponent>
-    </>
+    <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    </div>
   )
 }
 
