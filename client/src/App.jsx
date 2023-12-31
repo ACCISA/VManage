@@ -2,15 +2,24 @@ import axios from 'axios'
 import { useState } from 'react';
 import Header from './Header';
 import VMComponent from './VMComponent';
+import { Route, Routes } from "react-router-dom"
+import Layout from './Layout'; 
+import AddVM from './forms/AddVM';
+import Index from './pages/Index';
+import  { RequireAuth }  from "react-auth-kit";
+import Login from './pages/Login';
+import Add from './pages/Add';
 
-
-function App() {
+export default function App() {
 
   const [statusAPI, setStatusAPI] = useState("");
   const [name, setName] = useState("VM Name");
   const [path, setPath] = useState("VM Path");
   const [ip, setIp] = useState("VM IP");
   const [launchName, setLaunchName] = useState()
+
+  axios.defaults.baseURL = "http://localhost:4000";
+  axios.defaults.withCredentials = true;
 
   const handleLaunchVM = (ev) => {
     ev.preventDefault();
@@ -73,12 +82,26 @@ function App() {
   }
 
   return (
-    <div className=''>
-    <Header></Header>
-    <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
-    <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
-    </div>
+    
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<RequireAuth loginPath="/login">
+          <Index />
+        </RequireAuth>} />
+        <Route path="/add" element={<RequireAuth loginPath="/login">
+          <Add/>
+        </RequireAuth>}/>
+        <Route path="/login" element={<Login/>}></Route>
+      </Route>
+    </Routes>
+
+    
+
+    // <div className=''>
+    // <Header></Header>
+    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    // </div>
   )
 }
 
-export default App

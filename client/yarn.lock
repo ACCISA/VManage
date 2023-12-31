@@ -1415,6 +1415,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.14.1":
+  version: 1.14.1
+  resolution: "@remix-run/router@npm:1.14.1"
+  checksum: a3a0e7bd1917a4fd10322269b78ce1c5917a74889dfa747305b5a56e5d441b9187e1d8aaa6d58c4bf77713e7baca825f87057a64b2d21718cdb361f1cda75687
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-android-arm-eabi@npm:4.9.1":
   version: 4.9.1
   resolution: "@rollup/rollup-android-arm-eabi@npm:4.9.1"
@@ -2313,8 +2320,10 @@ __metadata:
     flowbite-react: ^0.7.2
     postcss: ^8.4.32
     react: ^18.2.0
+    react-auth-kit: 2.12.7
     react-dom: ^18.2.0
     react-icons: ^4.12.0
+    react-router-dom: ^6.21.1
     react-script: ^2.0.5
     tailwindcss: ^3.4.0
     vite: ^5.0.8
@@ -4613,6 +4622,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-cookie@npm:^3.0.1":
+  version: 3.0.5
+  resolution: "js-cookie@npm:3.0.5"
+  checksum: 2dbd2809c6180fbcf060c6957cb82dbb47edae0ead6bd71cbeedf448aa6b6923115003b995f7d3e3077bfe2cb76295ea6b584eb7196cca8ba0a09f389f64967a
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -4698,6 +4714,13 @@ __metadata:
     object.assign: ^4.1.4
     object.values: ^1.1.6
   checksum: f4b05fa4d7b5234230c905cfa88d36dc8a58a6666975a3891429b1a8cdc8a140bca76c297225cb7a499fad25a2c052ac93934449a2c31a44fc9edd06c773780a
+  languageName: node
+  linkType: hard
+
+"jwt-decode@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "jwt-decode@npm:3.1.2"
+  checksum: 20a4b072d44ce3479f42d0d2c8d3dabeb353081ba4982e40b83a779f2459a70be26441be6c160bfc8c3c6eadf9f6380a036fbb06ac5406b5674e35d8c4205eeb
   languageName: node
   linkType: hard
 
@@ -6702,6 +6725,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-auth-kit@npm:2.12.7":
+  version: 2.12.7
+  resolution: "react-auth-kit@npm:2.12.7"
+  dependencies:
+    js-cookie: ^3.0.1
+    jwt-decode: ^3.1.2
+    react: ">=16.8.0 || ^17.x || ^18.x"
+    react-router-dom: ^6.2.0
+  peerDependencies:
+    js-cookie: ^3.0.1
+    jwt-decode: ^3.1.2
+    react: ">=16.8.0 || ^17.x || ^18.x"
+    react-dom: ">=16.8.0 || ^17.x || ^18.x"
+    react-router-dom: ^6.2.0
+  checksum: 230ef366871757926ee8c41942ead7af5fced5316bc577657156dee7f508b19fd68b795a1b7651f56ec24f1dfb0e427ffe2ed9e62cea451295e7a80b6fdedf64
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
@@ -6772,6 +6813,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router-dom@npm:^6.2.0, react-router-dom@npm:^6.21.1":
+  version: 6.21.1
+  resolution: "react-router-dom@npm:6.21.1"
+  dependencies:
+    "@remix-run/router": 1.14.1
+    react-router: 6.21.1
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: d8ea3370babab626827008ced8a776ac991023745dc69d44332b6a5229dd2a6899f3e46fc50365cef0c7487cf726bcdccb365ec106915f92c735da6e4c2e6b97
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.21.1":
+  version: 6.21.1
+  resolution: "react-router@npm:6.21.1"
+  dependencies:
+    "@remix-run/router": 1.14.1
+  peerDependencies:
+    react: ">=16.8"
+  checksum: c6774cf4440b524401cecb40f4fbf4dbc89d61405f9f6d3cb3d2338e262a5254b9e27bc6039dc32e2c5f8b3009e83e9d6b30a61159dd6c423297cb0e3bd46fb3
+  languageName: node
+  linkType: hard
+
 "react-script@npm:^2.0.5":
   version: 2.0.5
   resolution: "react-script@npm:2.0.5"
@@ -6779,7 +6844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.2.0":
+"react@npm:>=16.8.0 || ^17.x || ^18.x, react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:
