@@ -55,6 +55,9 @@ class VirtualMachine:
 
     async def start(self):
         # result = os.popen(self.start_command).read()
+        if await self.ping_host():
+            print("vm is already running")
+            return
         print("Trying to start vm")
         if not self.is_file(self.path):
             self.status = "Failed"
