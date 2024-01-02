@@ -203,7 +203,12 @@ async def get_vm(request: Request):
         vm: VirtualMachine = machines[machine]
         if vm.path in running_vm and vm.status != "Online":
             vm.status = "Online"
-            vm.store()            
+            vm.store() 
+            continue   
+        if vm.path not in running_vm and vm.status == "Online":
+            vm.status = "Offline"
+            vm.store()
+            continue        
         machines_dict.append(vm.config.machines[machine])
     return {"machines":machines_dict}
 
