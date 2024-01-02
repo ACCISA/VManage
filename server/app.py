@@ -41,8 +41,9 @@ async def post_setting(request: Request):
 
         vmware_path = data.get("vmware_path")
         if vmware_path is None: return "Invalid value for setting vmware_path"
-
+        global VMWARE_PATH
         VMWARE_PATH = vmware_path
+        print(f"vmware_path updated to {VMWARE_PATH}")
         old_setting = json.load(open("config.json"))
         old_setting["vmware_path"] = vmware_path
         fw = open("config.json","w")
@@ -137,7 +138,8 @@ async def post_status(request: Request):
         if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"name {name} not found in stored machines")
 
         vm: VirtualMachine = machines.get(name)
-
+        if vm.status == "Failed":
+            return {"status":"Failed","details":vm.fail_reason}
         return {"status": vm.status}
 
     except Exception as e:
@@ -158,9 +160,13 @@ async def create_item(request: Request):
         if name is None: raise HTTPException(status_code=422, detail="Name is required")
         
         global machines
+        global VMWARE_PATH
 
         if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"VM {name} not found")
         vm = machines[name]
+        vm: VirtualMachine
+        vm.vmware_path = VMWARE_PATH
+        print(vm.vmware_path, "started with this path")
         task = asyncio.create_task(vm.start())
         return {"status":"started"}
     except Exception as e:
