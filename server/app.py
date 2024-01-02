@@ -9,7 +9,7 @@ import asyncio
 
 load_dotenv()
 
-VMWARE_PATH = os.getenv('VMWARE_PATH')
+VMWARE_PATH = None
 machines = {}
 vm_run = "vmrun"
 app = FastAPI(timeout=86400)
@@ -26,35 +26,52 @@ app.add_middleware(
 
 
 
-@app.get("/test")
-async def test():
-    return "ok"
-
 @app.get("/setting")
 async def get_setting():
-    return "settings"
+    global VMWARE_PATH
+    return {"vmware_path":VMWARE_PATH}
+
 
 @app.post("/setting")
 async def post_setting(request: Request):
-    global VMWARE_PATH
     try:
         data = await request.json()
-        # TODO make this work for different settings
-        if "vmware_path" not in data.keys(): return {"status":"Unknown"}
+        if "vmware_path" not in data.keys(): return "Unknown Setting"
 
         vmware_path = data.get("vmware_path")
-        if vmware_path is None: return {"status":"Invalid"}
+        if vmware_path is None: return "Invalid value for setting vmware_path"
 
-        #store the setting somewhere
         VMWARE_PATH = vmware_path
-        config = json.load(open("config.json"))
-        config["vmware_path"] = vmware_path
+        old_setting = json.load(open("config.json"))
+        old_setting["vmware_path"] = vmware_path
         fw = open("config.json","w")
-        json.dump(config, fw)
-        return {"status":"Saved"}
+        json.dump(old_setting, fw)
+        return {"status":"updated"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
+        
+@app.post("/login")
+async def post_login(request: Request):
+    try:
 
+        # Terrible authentication but it doesnt matter
+
+        data = await request.json()
+
+        if "password" not in data.keys(): raise HTTPException(status_code=403, detail="Missing password")
+        if "username" not in data.keys(): raise HTTPException(status_code=403, detail="Missing username")
+
+        username = data.get("username")
+        password = data.get("password")
+
+        if username == "vmanage" and password == "vmanage": return {"status":"valid"}
+        raise HTTPException(status_code=403, detail="Unauthorized access")
+
+
+    except Exception as e:
+        raise HTTPException(status_code=403, detail=str(e))
+
+    
 @app.post("/remove")
 async def post_remove(request: Request):
     try:
@@ -168,12 +185,22 @@ async def post_stop(request: Request):
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
+@app.get("/vm")
+async def get_vm(request: Request):
+    machines_dict = []
+    for machine in machines.keys():
+        machine: VirtualMachine
+        machines_dict.append(machine.config.machines[machine])
+    return {"machines":machines_dict}
+
 def create_config_file():
     config_filename = 'config.json'
 
     # Check if the config file already exists
     if os.path.exists(config_filename):
         print(f"{config_filename} already exists. Skipping creation.")
+        global VMWARE_PATH
+        VMWARE_PATH = json.load(open("config.json"))["vmware_path"]
         return
 
     # Default configuration
