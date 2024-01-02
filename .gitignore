@@ -3,8 +3,6 @@ client\node_modules
 .vscode
 server/venv/
 __pycache__/
-client/postcss.config.js
-client/tailwind.config.js
 client/package.json
 client/yarn.lock
 client/.eslintrc.cjs

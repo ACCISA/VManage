@@ -1,17 +1,26 @@
 import axios from 'axios'
 import { useState } from 'react';
-import Add from './forms/Add';
 import Header from './Header';
+import VMComponent from './VMComponent';
+import { Route, Routes } from "react-router-dom"
+import Layout from './Layout'; 
+import AddVM from './forms/AddVM';
+import Index from './pages/Index';
+import  { RequireAuth }  from "react-auth-kit";
+import Login from './pages/Login';
+import Add from './pages/Add';
 
-function App() {
+export default function App() {
 
   const [statusAPI, setStatusAPI] = useState("");
   const [launchName, setLaunchName] = useState("test");
   const [vmPath, setVmPath] = useState("C:\\Program Files (x86)\\VMware\\VMware Player\\");
   const [removeName, setRemoveName] = useState("test");
 
+  axios.defaults.baseURL = "http://localhost:4000";
+  axios.defaults.withCredentials = true;
 
-  const handleStartVM = (ev) => {
+  const handleLaunchVM = (ev) => {
     ev.preventDefault();
     console.log("Attempting to launch VM");
     axios.post('http://localhost:8081/start',
@@ -68,7 +77,7 @@ function App() {
           console.log(res_status.data.status);
           if (res_status.data.status == "Online") {
             is_online = true;
-            console.log("vm is online");
+            console.log("vm online");
           }
       })
       if (is_online) break;
@@ -101,51 +110,26 @@ function App() {
   }
 
   return (
-    <>
+    
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<RequireAuth loginPath="/login">
+          <Index />
+        </RequireAuth>} />
+        <Route path="/add" element={<RequireAuth loginPath="/login">
+          <Add/>
+        </RequireAuth>}/>
+        <Route path="/login" element={<Login/>}></Route>
+      </Route>
+    </Routes>
 
-      <Header></Header>
-    <div className=''>test</div>
-      <div className=''>
-        <h3 className=''>Add VM</h3>
-        <Add name/>
-        {/* <form onSubmit={handleAddVM} className=''>
-          <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
-          <input type="text" value={path} onChange={ev => setPath(ev.target.value)} />
-          <input type="text" value={ip} onChange={ev => setIp(ev.target.value)} />
-          <input type="submit" />
-        </form> */}
+    
 
-        <h3 className='bg-red-500'>Remove VM</h3>
-        <form onSubmit={handleRemoveVM} className=''>
-          <input type="text" value={removeName} onChange={ev => setRemoveName(ev.target.value)} />
-          <input type="submit" />
-        </form>
-
-        <h3 className='bg-red-500'>Start VM</h3>
-        <form onSubmit={handleStartVM}>
-          <input type="text" value={launchName} onChange={ev => setLaunchName(ev.target.value)} />
-          <input type="submit" />
-        </form>
-
-        <h3 className='bg-red-500'>Stop VM</h3>
-        <form onSubmit={handleStopVM}>
-          <input type="text" value={launchName} onChange={ev => setLaunchName(ev.target.value)} />
-          <input type="submit" />
-        </form>
-
-        <h3 className='bg-red-500'>Settings VM</h3>
-        <form onSubmit={handleSetting}>
-          <input type="text" value={vmPath} onChange={ev => setVmPath(ev.target.value)} />
-          <input type="submit" />
-        </form>
-        
-        <button onClick={handleTestSleep}>
-          Test Sleep
-        </button>
-      </div>
-      <h1>{statusAPI}</h1>
-    </>
+    // <div className=''>
+    // <Header></Header>
+    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
+    // </div>
   )
 }
 
-export default App
