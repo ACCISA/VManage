@@ -1,10 +1,7 @@
 import axios from 'axios'
 import { useState } from 'react';
-import Header from './Header';
-import VMComponent from './VMComponent';
 import { Route, Routes } from "react-router-dom"
 import Layout from './Layout'; 
-import AddVM from './forms/AddVM';
 import Index from './pages/Index';
 import  { RequireAuth }  from "react-auth-kit";
 import Login from './pages/Login';
@@ -17,8 +14,7 @@ export default function App() {
   const [vmPath, setVmPath] = useState("C:\\Program Files (x86)\\VMware\\VMware Player\\");
   const [removeName, setRemoveName] = useState("test");
 
-  axios.defaults.baseURL = "http://localhost:4000";
-  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = "http://localhost:8081";
 
   const handleLaunchVM = (ev) => {
     ev.preventDefault();
@@ -41,7 +37,7 @@ export default function App() {
   const handleStopVM = (ev) => {
     ev.preventDefault();
     console.log("Attempting to launch VM");
-    axios.post('http://localhost:8081/stop',
+    axios.post('/stop',
     {
       "name": launchName
     }, 
@@ -63,7 +59,7 @@ export default function App() {
       value = value  + 1
       if (value > 1000) break;
 
-      axios.post('http://localhost:8081/status',
+      axios.post('/status',
         {
           "name":"test"
         },
@@ -90,7 +86,7 @@ export default function App() {
   
   const handleRemoveVM = async (ev) => {
     ev.preventDefault();
-    axios.post("http://localhost:8081/remove", {
+    axios.post("/remove", {
       "name":removeName
     })
     .then(res => {
@@ -100,7 +96,7 @@ export default function App() {
 
   const handleSetting = async (ev) => {
     ev.preventDefault();
-    axios.post("http://localhost:8081/setting",{
+    axios.post("/setting",{
       "vmware_path": vmPath
     })
     .then( res => {
@@ -123,13 +119,6 @@ export default function App() {
       </Route>
     </Routes>
 
-    
-
-    // <div className=''>
-    // <Header></Header>
-    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
-    // <VMComponent vm_name="test" vm_path="D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx" vm_ip="192.168.111.222" vm_os="linux"></VMComponent>
-    // </div>
   )
 }
 

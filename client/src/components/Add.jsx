@@ -10,7 +10,7 @@ export default function Add() {
 
     const handleAddVM = async (ev) => {
         ev.preventDefault();
-        axios.post("http://localhost:8081/add", {
+        axios.post("/add", {
           "name":name,
           "path":path,
           "ip":ip

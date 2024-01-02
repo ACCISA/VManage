@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import './test.css'
 import { Button } from 'flowbite-react';
-import { FaEdit } from 'react-icons/fa'; // Import the edit icon from a library like Font Awesome
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import '../test.css'
 
 const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
 
@@ -10,11 +10,11 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
   const [isRunning, setIsRunning] = useState(false);
   const [bgStatus, setBgStatus] = useState("bg-red-600")
   
-  
+  const navigate = useNavigate();
 
   const handleStartStopVM = (ev) => {
     if (isRunning){
-      axios.post('http://localhost:8081/stop',
+      axios.post('/stop',
         {
           "name": vm_name
         }, 
@@ -31,7 +31,7 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
     ev.preventDefault();
     setIsRunning(true)
     console.log("Attempting to launch VM");
-    axios.post('http://localhost:8081/start',
+    axios.post('/start',
     {
       "name": vm_name
     }, 
@@ -53,7 +53,7 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
       value = value  + 1
       if (value > 1000) break;
 
-      axios.post('http://localhost:8081/status',
+      axios.post('/status',
         {
           "name":vm_name
         },
@@ -65,6 +65,7 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
         .then(res_status => {
           setStatus(res_status.data.status)
           if (res_status.data.status == 'Online') is_online = true;
+          if (res_status.data.status == 'Failed') is_online = true;
       })
       if (is_online) break;
       await new Promise(resolve => {
@@ -78,11 +79,23 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
     console.log("edit the vm's setting and send it to the server")
   }
 
+  const handleRemoveVM = () => {
+    axios.post("/remove", {
+      "name":vm_name
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res => {
+      console.log("then called")
+      window.location.reload()
+    })
+  }
 
   useEffect(() => {
-    console.log('useeffect called')
-    console.log(status)
-    if (status == "Offline") {
+    if (status == "Offline" || status == "Failed") {
       setBgStatus("bg-red-600")
     }
     if (status == "Starting"){
@@ -112,6 +125,9 @@ const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
         
         </div>
         <div className='flex flex-row gap-4 m-4 items-center'>
+          <Button className='bg-red-600' onClick={handleRemoveVM}>
+            Remove
+          </Button>
           <Button className="bg-gray-500" onClick={handleEditVM}>
             Edit 
             {/* <FaEdit className='ml-2' />   */}

@@ -30,6 +30,8 @@ class VirtualMachine:
         self.start_command = f'"{self.vmware_path}vmrun" start "{self.path}" nogui'
         self.stop_command = f'"{self.vmware_path}vmrun" stop "{self.path}"'
         self.ip = ip
+        self.fail_reason = None
+
         try:
             self.config = Config(**json.load(open("config.json")))
         except ValidationError as e:
@@ -62,6 +64,8 @@ class VirtualMachine:
             # Print error message if the command failed
             print(f"Error code: {result.returncode}")
             print(f"Error: {result.stderr.strip()}")
+            self.status = "Failed"
+            # self.fail_reason = 4294967295
 
     async def check_connection(self):
         is_online = False 

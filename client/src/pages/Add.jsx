@@ -1,4 +1,4 @@
-import AddVM from "../forms/AddVM";
+import AddVM from "../components/AddVM";
 
 export default function Add(){
     return (

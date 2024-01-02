@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from VirtualMachine import VirtualMachine
+from typing import Dict
 import os
 import json
 import asyncio
@@ -188,9 +189,9 @@ async def post_stop(request: Request):
 @app.get("/vm")
 async def get_vm(request: Request):
     machines_dict = []
+    global machines
     for machine in machines.keys():
-        machine: VirtualMachine
-        machines_dict.append(machine.config.machines[machine])
+        machines_dict.append(machines[machine].config.machines[machine])
     return {"machines":machines_dict}
 
 def create_config_file():
@@ -200,7 +201,13 @@ def create_config_file():
     if os.path.exists(config_filename):
         print(f"{config_filename} already exists. Skipping creation.")
         global VMWARE_PATH
-        VMWARE_PATH = json.load(open("config.json"))["vmware_path"]
+        global machines
+        config_data = json.load(open("config.json"))
+        VMWARE_PATH = config_data["vmware_path"]
+        machines_dict = config_data["machines"]      
+        for machine in machines_dict.keys():
+            vm = VirtualMachine(name=machines_dict[machine]["name"], path=machines_dict[machine]["path"],vmware_path=VMWARE_PATH,ip=machines_dict[machine]["ip"])
+            machines[machine] = vm  
         return
 
     # Default configuration
