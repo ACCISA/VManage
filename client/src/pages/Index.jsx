@@ -7,9 +7,8 @@ export default function Index() {
     const [machines, setMachines] = useState([]);
 
     const renderMachines = machines.map((item, index) => (
-        <VMComponent vm_name={item.name} vm_path={item.path} vm_ip={item.ip} vm_os={item.os}></VMComponent>
+        <VMComponent vm_status={item.status} vm_name={item.name} vm_path={item.path} vm_ip={item.ip} vm_os={item.os}></VMComponent>
     ))
-    console.log(machines)
 
     useEffect(() => {
         const retrieveVM = () => {

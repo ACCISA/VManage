@@ -4,13 +4,13 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../test.css'
 
-const VMComponent = ({vm_name, vm_path, vm_ip, vm_os}) => {
+const VMComponent = ({vm_status, vm_name, vm_path, vm_ip, vm_os}) => {
 
-  const [status, setStatus] = useState("Offline");
+  const [status, setStatus] = useState(vm_status);
   const [isRunning, setIsRunning] = useState(false);
   const [bgStatus, setBgStatus] = useState("bg-red-600")
   
-  const navigate = useNavigate();
+
 
   const handleStartStopVM = (ev) => {
     if (isRunning){

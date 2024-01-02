@@ -43,6 +43,9 @@ class VirtualMachine:
     def stop_command(self):
         return f'"{self.vmware_path}vmrun" stop "{self.path}"'
 
+    def list_command(self):
+        return f'"{self.vmware_path}vmrun" list'
+
     def store(self):
         self.config.machines[self.name] = dict(VM(name=self.name,ip=self.ip,path=self.path,status=self.status))
         self.update_config()
@@ -73,8 +76,10 @@ class VirtualMachine:
         
         result = subprocess.run(self.start_command(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
         self.status = "Starting"
+        self.store()
         if result.returncode == 0:
             print("VM started, pinging host")
+            await self.is_running()
             await self.check_connection()
             self.status = "Online"
             print("VM is online")
@@ -111,18 +116,39 @@ class VirtualMachine:
             print(f"Error: {e.stderr.strip()}")
             return False
 
-    def stop(self):
+    async def stop(self):
         print("trying to stop vm")
+
+        if not self.is_file(self.path):
+            self.status = "Failed"
+            self.fail_reason = "vmx file path does not exists"
+            print("VM file path does not exist")
+            return
+
+        if not self.is_file(self.vmware_path):
+            self.status = "Failed"
+            self.fail_reason = "VMware folder does not exists"
+            self.store()
+            print("VMware folder does not exists")
+            return
+        
+        if not await self.is_running():
+            self.status = "Offline"
+            self.store()
+            return
+
         result = subprocess.run(self.stop_command(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        del self.config.machines[self.name]
-        self.update_config()
+        
         if result.returncode == 0:
             print("VM stoped")
             self.status = "Offline"
         else:
-            # Print error message if the command failed
+            self.status = "Failed"
+            self.fail_reason = "vmx file is being used by another process"
             print(f"Error code: {result.returncode}")
             print(f"Error: {result.stderr.strip()}")
+        self.store()
+        
 
     def remove(self):
         print("Removing vm")
@@ -133,3 +159,13 @@ class VirtualMachine:
 
     def is_file(self, file_path):
         return os.path.exists(file_path)
+    
+    async def is_running(self):
+        result = VirtualMachine.get_running_vms(self.vmware_path)
+        if self.path in result: return True
+        return False
+    
+    def get_running_vms(vmware_path):
+        return subprocess.run(f'"{vmware_path}vmrun" list'
+            , stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True).stdout.strip()
+        

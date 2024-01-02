@@ -168,6 +168,7 @@ async def create_item(request: Request):
         vm.vmware_path = VMWARE_PATH
         print(vm.vmware_path, "started with this path")
         task = asyncio.create_task(vm.start())
+
         return {"status":"started"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -186,8 +187,8 @@ async def post_stop(request: Request):
         if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"name {name} not found in stored machines")
 
         vm: VirtualMachine = machines.get(name)
-        vm.stop()
-        del machines[name]
+        await vm.stop() # change this to create_task()
+
         return {"status":"Offline"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -196,8 +197,14 @@ async def post_stop(request: Request):
 async def get_vm(request: Request):
     machines_dict = []
     global machines
+    global VMWARE_PATH
+    running_vm = VirtualMachine.get_running_vms(VMWARE_PATH)
     for machine in machines.keys():
-        machines_dict.append(machines[machine].config.machines[machine])
+        vm: VirtualMachine = machines[machine]
+        if vm.path in running_vm and vm.status != "Online":
+            vm.status = "Online"
+            vm.store()            
+        machines_dict.append(vm.config.machines[machine])
     return {"machines":machines_dict}
 
 def create_config_file():
