@@ -1,6 +1,7 @@
 # VManage
-React app to manage vms
+VManage is a web application designed for streamlined management of headless virtual machines. With an intuitive user interface, VManage empowers users to effortlessly add virtual machines and execute operations with ease.
 
+VManage streamlines the management of headless virtual machines by seamlessly integrating with VMware's utility scripts. This integration enables users to centralize various operations required for efficiently operating virtual machines.
 ## UI Dev
 
 1. clone the repo and setup auth for push
