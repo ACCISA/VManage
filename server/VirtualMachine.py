@@ -59,11 +59,18 @@ class VirtualMachine:
             print("vm is already running")
             return
         print("Trying to start vm")
+        
+        if not self.is_file(self.vmware_path):
+            self.status = "Failed"
+            self.fail_reason = "VMware folder does not exists"
+            print("VMware folder does not exists")
+            return
         if not self.is_file(self.path):
             self.status = "Failed"
             self.fail_reason = "VM file path does not exists"
             print("VM file path does not exist")
             return
+        
         result = subprocess.run(self.start_command(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
         self.status = "Starting"
         if result.returncode == 0:

@@ -12,6 +12,10 @@ export default function Header() {
     navigate("/add")
   }
 
+  const handleRedirectSetting = () => {
+    navigate("/setting")
+  }
+
   return (
     <Navbar className='nb bg-blacktext-3xl-500 mb-20' fluid rounded>
       <Button onClick={handleRedirectAdd} className=' bg-black text-white font-semibold'>Add VM</Button>
@@ -20,7 +24,7 @@ export default function Header() {
         
         <NavbarToggle />
       </div>
-      <div className="settings-icon ml-80 text-2xl text-white">
+      <div className="settings-icon ml-80 text-2xl text-white" onClick={handleRedirectSetting}>
         <FaCog />
       </div>
 

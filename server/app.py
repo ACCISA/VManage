@@ -48,7 +48,7 @@ async def post_setting(request: Request):
         old_setting["vmware_path"] = vmware_path
         fw = open("config.json","w")
         json.dump(old_setting, fw)
-        return {"status":"updated"}
+        return {"status":"Updated"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
         
