@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -41,7 +42,8 @@ async def post_setting(request: Request):
         if "vmware_path" not in data.keys(): return "Unknown Setting"
 
         vmware_path = data.get("vmware_path")
-        if vmware_path is None: return "Invalid value for setting vmware_path"
+        if vmware_path is None or vmware_path == "": return {"status":"VM_FAILED","detail":"INVALID_VMWARE_VALUE"}
+        if not VirtualMachine.is_file(vmware_path): return {"status":"VM_FAILED","detail":"INVALID_VMWARE_PATH_SETTING"}
         global VMWARE_PATH
         VMWARE_PATH = vmware_path
         print(f"vmware_path updated to {VMWARE_PATH}")
@@ -80,19 +82,21 @@ async def post_remove(request: Request):
     try:
         data = await request.json()
 
-        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
 
         name = data.get("name")
 
-        if name is None: raise HTTPException(status_code=422, detail="Name is required")
-
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        
         global machines
-        if name not in machines.keys(): return {"status":"Unknown"}
-
+        if name not in machines.keys(): 
+            logging.error(f"vm '{name}' -> Failed, unknown vm name")
+            return JSONResponse(content={"status":"UNKNOWN_VM_NAME"}, status_code=422)
+        
         vm: VirtualMachine = machines[name]
         vm.remove()        
         del machines[name]
-        return {"status":"Removed"}
+        return JSONResponse(content={"status":"VM_REMOVED"}, status_code=200)
 
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -102,17 +106,17 @@ async def post_add(request: Request):
     try:
         data = await request.json()
 
-        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
-        if "path" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm path")
-        if "ip" not in data.keys(): raise HTTPException(status_code=422, detail="Missing ip")
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
+        if "path" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
+        if "ip" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
         
         name = data.get("name")
         path = data.get("path")
         ip = data.get("ip")
 
-        if name is None: raise HTTPException(status_code=422, detail="Name is required")
-        if path is None: raise HTTPException(status_code=422, detail="Name is required")
-        if ip is None: raise HTTPException(status_code=422, detail="Name is required")
+        if name is None or name == "":  return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        if path is None or path == "":  return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        if ip is None or ip == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
 
         global VMWARE_PATH
         global machines
@@ -121,75 +125,115 @@ async def post_add(request: Request):
         machines[name] = vm
         
         logging.debug("vm added to config")
-        return {"status":"Added"}
+        return JSONResponse(content={"status":"VM_ADDED"}, status_code=200)
     except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        return JSONResponse(content={"status":str(e)}, status_code=422)
 
 @app.post("/status")
 async def post_status(request: Request):
     try:
         data = await request.json()
 
-        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
-
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"},status_code=422)
+        
         name = data.get("name")
-    
-        if name is None: raise HTTPException(status_code=422, detail="vm name is None")
+
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        
         global machines
-        if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"name {name} not found in stored machines")
+        if name not in machines.keys(): 
+            logging.error(f"vm '{name}' -> Failed, unknown vm name")
+            return JSONResponse(content={"status":"UNKNOWN_VM_NAME"}, status_code=422)
 
         vm: VirtualMachine = machines.get(name)
         return_status = {"status": vm.status}
-        if vm.status == "Failed":
-            return_status = {"status":"Failed","details":vm.fail_reason}
+        if vm.status == "VM_FAILED":
+            return_status = {"status":"VM_FAILED","detail":vm.fail_reason}
         logging.debug(f"vm '{name}' -> {return_status}")
-        return return_status
+        return JSONResponse(content={"status":vm.status}, status_code=200)
+    
     except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        return JSONResponse(content={"status":str(e)},status_code=200)
+
+@app.post("/ping")
+async def post_ping(request: Request):
+    try:
+        
+        data = await request.json()
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"},status_code=422)
+        name = data.get("name")
+
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        
+        global machines
+
+        if name not in machines.keys(): 
+            logging.error(f"vm '{name}' -> Failed, unknown vm name")
+            return JSONResponse(content={"status":"UNKNOWN_VM_NAME"}, status_code=422)
+
+        vm: VirtualMachine = machines[name]
+        status = await vm.ping_host()
+        logging.debug(f"vm '{vm.name}' ping -> {status}")
+        return JSONResponse(content={"status":"HOST_UP" if status else "HOST_DOWN"}, status_code=200)
+
+    except Exception as e:
+        logging.debug(f"vm '{vm.name}' ping -> {status}")
+        return JSONResponse(content={"status":"HOST_DOWN"},status_code=200)
 
 @app.post("/start")
 async def create_item(request: Request):
     try:
         data = await request.json()
 
-        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
         
         name = data.get("name")
 
-        if name is None: raise HTTPException(status_code=422, detail="Name is required")
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
         
         global machines
         global VMWARE_PATH
 
-        if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"VM {name} not found")
-        vm = machines[name]
-        vm: VirtualMachine
+        if name not in machines.keys(): 
+            logging.error(f"vm '{name}' -> Failed, unknown vm name")
+            return JSONResponse(content={"status":"UNKNOWN_VM_NAME"}, status_code=422)
+        vm: VirtualMachine = machines[name]
         vm.vmware_path = VMWARE_PATH
+        
+        status, path = vm.validate_paths()
+        if not status:
+            logging.error(f"vm '{name}' -> Failed, {path} does not exists")
+            return JSONResponse(content={"status":"INVALID_VMWARE_PATH" if path == "vmware_path" else "INVALID_VMX_PATH"}, status_code=422)
+        
         logging.debug(f"vm '{name}' started -> {vm.vmware_path}")
         task = asyncio.create_task(vm.start())
 
-        return {"status":"started"}
+        return JSONResponse(content={"status":"START_SUCCESS"}, status_code=200)
     except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        logging.error(str(e))
+        return JSONResponse(content={"status":str(e)}, status_code=422)
 
 @app.post("/stop")
 async def post_stop(request: Request):
     try:
         data = await request.json()
 
-        if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
-
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
+        
         name = data.get("name")
 
-        if name is None: raise HTTPException(status_code=422, detail="vm name is None")
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
         global machines
-        if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"name {name} not found in stored machines")
-
+        if name not in machines.keys(): 
+            logging.error(f"vm '{name}' -> Failed, unknown vm name")
+            return JSONResponse(content={"status":"UNKNOWN_VM_NAME"}, status_code=422)
         vm: VirtualMachine = machines.get(name)
         await vm.stop() # change this to create_task()
-        return {"status":"Offline"}
+
+        return JSONResponse(content={"status":"STOP_SUCCESS"}, status_code=200)
+    
     except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        return JSONResponse(content={"status":str(e)}, status_code=422)
 
 @app.get("/vm")
 async def get_vm(request: Request):
@@ -199,12 +243,12 @@ async def get_vm(request: Request):
     running_vm = VirtualMachine.get_running_vms(VMWARE_PATH)
     for machine in machines.keys():
         vm: VirtualMachine = machines[machine]
-        if vm.path in running_vm and vm.status != "Online":
-            vm.status = "Online"
+        if vm.path in running_vm and vm.status != "VM_ONLINE":
+            vm.status = "VM_ONLINE"
             vm.store() 
             continue   
-        if vm.path not in running_vm and vm.status == "Online":
-            vm.status = "Offline"
+        if vm.path not in running_vm and vm.status == "VM_ONLINE":
+            vm.status = "VM_OFFLINE"
             vm.store()
             continue        
         machines_dict.append(vm.config.machines[machine])
@@ -240,6 +284,9 @@ def create_config_file():
 # Run the FastAPI application on port 8080
 if __name__ == "__main__":
     import uvicorn
+
+    logging.basicConfig(level=logging.DEBUG)
+
     create_config_file()
     VirtualMachine.config_file = "config.json"
     uvicorn.run(app, host="localhost", port=8081)

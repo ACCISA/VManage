@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useState } from 'react';
 import { Route, Routes } from "react-router-dom"
 import Layout from './Layout'; 
 import Index from './pages/Index';

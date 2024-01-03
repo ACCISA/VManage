@@ -35,7 +35,7 @@ class VirtualMachine:
             self.config = Config(**json.load(open("config.json")))
         except ValidationError as e:
             logging.error(e)
-        self.status = "Offline"
+        self.status = "VM_OFFLINE"
         self.store()
 
     def start_command(self):
@@ -63,30 +63,26 @@ class VirtualMachine:
             logging.warning("VM already started")
             return
         
-        if not self.is_file(self.vmware_path):
-            self.status = "Failed"
-            self.fail_reason = "VMware folder does not exists"
-            logging.error("vmrun folder does not exists")
-            return
-
-        if not self.is_file(self.path):
-            self.status = "Failed"
-            self.fail_reason = "VM file path does not exists"
-            logging.error("vmx file path does not exists")
+        status, path = self.validate_paths()
+        if not status:
+            logging.error(f"{path} does not exists")
+            self.status = "VM_OFFLINE"
+            self.fail_reason = f"{path} does not exists"
+            self.store()
             return
         
         result = subprocess.run(self.start_command(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        self.status = "Starting"
+        self.status = "VM_STARTING"
         self.store()
         if result.returncode == 0:
             logging.debug("VM started, pinging host")
             await self.is_running()
             await self.check_connection()
-            self.status = "Online"
+            self.status = "VM_ONLINE"
             logging.debug("VM is online")
             self.store()
         else:
-            self.status = "Failed"
+            self.status = "VM_FAILED"
             if result.returncode == 4294967295:
                 logging.error("vmx file is being used by another process")
                 self.fail_reason = "File is being used by another process"
@@ -111,29 +107,23 @@ class VirtualMachine:
             if "timed out" not in stdout and "host unreachable" not in stdout: return True 
             logging.debug(f"{self.ip} is down")
             return False
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logging.error(f"error pinging {self.ip}")
-            logging.error(f"Error: {e.stderr.strip()}")
             return False
 
     async def stop(self):
-
-        if not self.is_file(self.path):
-            self.status = "Failed"
-            self.fail_reason = "vmx file path does not exists"
-            logging.error("vmx file path does not exists")
-            return
-
-        if not self.is_file(self.vmware_path):
-            self.status = "Failed"
-            self.fail_reason = "VMware folder does not exists"
+        
+        status, path = self.validate_paths()
+        if not status:
+            logging.error(f"{path} does not exists")
+            self.status = "VM_OFFLINE"
+            self.fail_reason = f"{path} does not exists"
             self.store()
-            logging.error("vmrun folder does not exists")
             return
         
         if not await self.is_running():
             logging.warning("vm was already offline")
-            self.status = "Offline"
+            self.status = "VM_OFFLINE"
             self.store()
             return
         
@@ -141,9 +131,9 @@ class VirtualMachine:
         
         if result.returncode == 0:
             logging.debug("vm was stoped")
-            self.status = "Offline"
+            self.status = "VM_OFFLINE"
         else:
-            self.status = "Failed"
+            self.status = "VM_FAILED"
             self.fail_reason = "vmx file is being used by another process"
             logging.debug("vmrun stop failed")
             logging.debug(f"Error: {result.stderr.strip()}")
@@ -157,7 +147,12 @@ class VirtualMachine:
         json.dump(data, fw)
         logging.debug("vm was removed from config")
 
-    def is_file(self, file_path):
+    def validate_paths(self):
+        if not VirtualMachine.is_file(self.vmware_path): return (False, "vmware_path")
+        if not VirtualMachine.is_file(self.path): return (False, "vmx_path")
+        return (True, None)
+
+    def is_file(file_path):
         return os.path.exists(file_path)
     
     async def is_running(self):

@@ -53,9 +53,9 @@ async def post_add(request: Request):
 async def post_status(request: Request):
     try:
         global loading
-        status = "Offline"
-        if loading: status = "Starting"
-        if online: status = "Online"
+        status = "VM_OFFLINE"
+        if loading: status = "VM_STARTING"
+        if online: status = "VM_ONLINE"
 
         print(status)
         return {"status": status}

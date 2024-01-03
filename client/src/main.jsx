@@ -4,6 +4,8 @@ import App from './App.jsx'
 import './index.css'
 import { AuthProvider } from "react-auth-kit"
 import { BrowserRouter } from "react-router-dom"
+import { ReactNotifications } from 'react-notifications-component'
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -13,6 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       cookieDomain={window.location.hostname}
       cookieSecure={false}>
       <BrowserRouter>
+        <ReactNotifications />
         <App />
       </BrowserRouter>
     </AuthProvider>

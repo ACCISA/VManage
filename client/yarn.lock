@@ -2324,6 +2324,7 @@ __metadata:
     react-auth-kit: 2.12.7
     react-dom: ^18.2.0
     react-icons: ^4.12.0
+    react-notifications-component: ^4.0.1
     react-router-dom: ^6.21.1
     react-script: ^2.0.5
     tailwindcss: ^3.4.0
@@ -6804,6 +6805,15 @@ __metadata:
     "@types/react": ">=18"
     react: ">=18"
   checksum: ca1daa650d48b84a5a9771683cdb3f3d2d418247ce0faf73ede3207c65f2a21cdebb9df37afda67f6fc8f0f0a7b9ce00eb239781954a4d6c7ad88ea4df068add
+  languageName: node
+  linkType: hard
+
+"react-notifications-component@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "react-notifications-component@npm:4.0.1"
+  peerDependencies:
+    react: ^18.0.1
+  checksum: cf29c0dd84893ee63d02c838fae03ef6128b7f1a798f7dc24f22144f9a9003d4afd01ed0f757f3cc9eaf423549995c70ac13e159bf562ae478a7c231fc3df6c0
   languageName: node
   linkType: hard
 

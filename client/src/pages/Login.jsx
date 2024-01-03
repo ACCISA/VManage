@@ -51,7 +51,7 @@ export default function Login(){
 
     return (
         <div className="flex flex-col items-center justify-center">
-            <Card className="bg-vm-info-color-500">
+            <Card className="bg-vm-info-color-500 text-white border-white shadow-white shadow-md">
                 <form className="flex flex-col gap-4" onSubmit={handleLogin}>
                 <div>
                     <div className="mb-2 block">
@@ -66,7 +66,7 @@ export default function Login(){
                     <TextInput id="password1" value={password} type="password" onChange={ev => setPassword(ev.target.value)} required />
                 </div>
                 {invalid && <div className="text-red-600 font-bold">Invalid Credentials</div>}
-                <Button type="submit" className="border-black text-black">Submit</Button>
+                <Button type="submit" className="border-white">Submit</Button>
                 </form>
             </Card>
         </div>
