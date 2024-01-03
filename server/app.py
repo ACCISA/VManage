@@ -6,6 +6,7 @@ from VirtualMachine import VirtualMachine
 from typing import Dict
 import os
 import json
+import logging
 import asyncio
 
 load_dotenv()
@@ -100,7 +101,7 @@ async def post_remove(request: Request):
 async def post_add(request: Request):
     try:
         data = await request.json()
-        print(data)
+
         if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
         if "path" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm path")
         if "ip" not in data.keys(): raise HTTPException(status_code=422, detail="Missing ip")
@@ -119,7 +120,7 @@ async def post_add(request: Request):
         vm = VirtualMachine(name,path,VMWARE_PATH,ip)
         machines[name] = vm
         
-        print("Virutal machine started")
+        logging.debug("vm added to config")
         return {"status":"Added"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -138,10 +139,11 @@ async def post_status(request: Request):
         if name not in machines.keys(): raise HTTPException(status_code=422, detail=f"name {name} not found in stored machines")
 
         vm: VirtualMachine = machines.get(name)
+        return_status = {"status": vm.status}
         if vm.status == "Failed":
-            return {"status":"Failed","details":vm.fail_reason}
-        return {"status": vm.status}
-
+            return_status = {"status":"Failed","details":vm.fail_reason}
+        logging.debug(f"vm '{name}' -> {return_status}")
+        return return_status
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -149,11 +151,8 @@ async def post_status(request: Request):
 async def create_item(request: Request):
     try:
         data = await request.json()
-        # TODO verify content
 
         if "name" not in data.keys(): raise HTTPException(status_code=422, detail="Missing vm name")
-        
-        print("all data present")
         
         name = data.get("name")
 
@@ -166,7 +165,7 @@ async def create_item(request: Request):
         vm = machines[name]
         vm: VirtualMachine
         vm.vmware_path = VMWARE_PATH
-        print(vm.vmware_path, "started with this path")
+        logging.debug(f"vm '{name}' started -> {vm.vmware_path}")
         task = asyncio.create_task(vm.start())
 
         return {"status":"started"}
@@ -188,7 +187,6 @@ async def post_stop(request: Request):
 
         vm: VirtualMachine = machines.get(name)
         await vm.stop() # change this to create_task()
-
         return {"status":"Offline"}
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -217,7 +215,7 @@ def create_config_file():
 
     # Check if the config file already exists
     if os.path.exists(config_filename):
-        print(f"{config_filename} already exists. Skipping creation.")
+        logging.warning(f"{config_filename} already exists. Skipping creation.")
         global VMWARE_PATH
         global machines
         config_data = json.load(open("config.json"))
@@ -238,7 +236,7 @@ def create_config_file():
     with open(config_filename, 'w') as config_file:
         json.dump(default_config, config_file, indent=4)
 
-    print(f"{config_filename} created with default configurations.")
+    logging.debug(f"{config_filename} created with default configurations.")
 # Run the FastAPI application on port 8080
 if __name__ == "__main__":
     import uvicorn

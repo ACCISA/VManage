@@ -8,9 +8,12 @@
 # vm = VirtualMachine("test",'D:\\metasploitable\\metasploitable-linux-2.0.0\\Metasploitable2-Linux\\Metasploitable.vmx',VMWARE_PATH,"192.168.111.222")
 # print(type(vm.status))
 # vm.store()
-from pythonping import ping
+import subprocess
 
-t = str(ping('127.0.0.1',verbose=True,count=1))
+def run_command(command):
+    result = subprocess.run(command, stdout=subprocess.PIPE, text=True, shell=True)
+    stdout = result.stdout.strip()
+    result_code = result.returncode
+    return (stdout, result_code)    
 
-print("---")
-print(t, 'ss')
+run_command("ping 12ss7.0.0.1")

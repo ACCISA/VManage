@@ -7,7 +7,7 @@ import '../test.css'
 const VMComponent = ({vm_status, vm_name, vm_path, vm_ip, vm_os}) => {
 
   const [status, setStatus] = useState(vm_status);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState((vm_status == "Offline") ? false : true);
   const [bgStatus, setBgStatus] = useState("bg-red-600")
   
 
@@ -25,6 +25,7 @@ const VMComponent = ({vm_status, vm_name, vm_path, vm_ip, vm_os}) => {
         })
         .then(res_start => {
           setStatus("Offline")
+          setIsRunning(false)
         });
       return;
     }
