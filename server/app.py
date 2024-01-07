@@ -28,6 +28,26 @@ app.add_middleware(
 )
 
 
+@app.post("/getip")
+async def post_getip(request: Request):
+    try:
+        data = await request.json()
+
+        if "name" not in data.keys(): return JSONResponse(content={"status":"MISSING_KEY_NAME"}, status_code=422)
+
+        name = data.get("name")
+
+        if name is None or name == "": return JSONResponse(content={"status":"INVALID_KEY_NAME"}, status_code=422)
+        
+        global machines
+
+        vm: VirtualMachine = machines[name]
+        retrieved_ip = vm.get_ip()
+
+    except Exception as e:
+        return JSONResponse(content={"status":"GETIP_FAILED","detail":str(e)})
+
+
 
 @app.get("/setting")
 async def get_setting():

@@ -121,6 +121,19 @@ const VMComponent = ({vm_status, vm_name, vm_path, vm_ip, vm_os}) => {
     })
   }
 
+  const handleGetIP = () => {
+    axios.post("/getip",{
+      "name": vm_name
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(res => {
+      
+    })
+  }
+
   const handleRemoveVM = () => {
     axios.post("/remove", {
       "name":vm_name
@@ -183,7 +196,9 @@ const VMComponent = ({vm_status, vm_name, vm_path, vm_ip, vm_os}) => {
           <Button className="bg-green-500" onClick={handleStartStopVM}>
             {isRunning ? 'Stop' : 'Start'}
           </Button>
-
+          <Button className='bg-gray-500' onClick={handleGetIP}>
+            Get IP
+          </Button>
         </div>
         
       </div>

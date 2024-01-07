@@ -47,6 +47,9 @@ class VirtualMachine:
     def list_command(self):
         return f'"{self.vmware_path}vmrun" list'
 
+    def getip_command(self):
+        return f'"{self.vmware_path}vmrun" getGuestIPAddress "{self.path}"'
+
     def store(self):
         self.config.machines[self.name] = dict(VM(name=self.name,ip=self.ip,path=self.path,status=self.status))
         self.update_config()
@@ -159,7 +162,24 @@ class VirtualMachine:
         result = VirtualMachine.get_running_vms(self.vmware_path)
         if self.path in result: return True
         return False
+
+    def get_ip(self):
+        result = subprocess.run(self.getip_command(), stderr=subprocess.PIPE, text=True, shell=True).stdout.strip()
+
+        logging.debug(result)
+        
+        if "The virtual machine is not powered on" in result:
+            return "VM_OFFLINE"
+
+        if "The VMware Tools are not running in the virtual machine" in result:
+            return "MISSING_VM_TOOLS"
+        
+        if "Cannot open VM" in result:
+            return "INVALID_VMX_PATH"
     
+        return result
+
+
     def get_running_vms(vmware_path):
         return subprocess.run(f'"{vmware_path}vmrun" list'
             , stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True).stdout.strip()
