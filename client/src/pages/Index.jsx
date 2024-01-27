@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import VMComponent from "../components/VMComponent"
+import VMCard from "../components/VMCard";
 import { ReactNotifications } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 import { useLocation } from "react-router-dom";
@@ -14,7 +15,7 @@ export default function Index() {
     let location = useLocation();
 
     const renderMachines = machines.map((item, index) => (
-        <VMComponent vm_status={item.status} vm_name={item.name} vm_path={item.path} vm_ip={item.ip} vm_os={item.os}></VMComponent>
+        <VMCard vm_status={item.status} vm_name={item.name} vm_path={item.path} vm_ip={item.ip} vm_os={item.os}></VMCard>
     ))
     
     useEffect(() => {

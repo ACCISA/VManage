@@ -10,8 +10,8 @@ import { ReactNotifications } from 'react-notifications-component'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider
-      authType={"cookie"}
-      authName={"_auth"}
+      authType="cookie"
+      authName="_auth"
       cookieDomain={window.location.hostname}
       cookieSecure={false}>
       <BrowserRouter>

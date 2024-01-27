@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/joy": "^5.0.0-beta.24",
+    "@mui/material": "^5.15.6",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
     "flowbite": "^2.2.1",
