@@ -15,9 +15,7 @@ export default function App() {
     
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<RequireAuth loginPath="/login">
-          <Index />
-        </RequireAuth>} />
+        <Route index element={<Index />} />
         <Route path="/add" element={<RequireAuth loginPath="/login"><Add/></RequireAuth>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/setting" element={<RequireAuth loginPath="/login"><Setting/></RequireAuth>}/>
