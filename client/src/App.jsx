@@ -1,27 +1,19 @@
-import axios from 'axios'
-import { Route, Routes } from "react-router-dom"
-import Layout from './Layout'; 
-import Index from './pages/Index';
-import  { RequireAuth }  from "react-auth-kit";
-import Login from './pages/Login';
-import Add from './pages/Add';
-import Setting from './pages/Setting';
+/* eslint-disable perfectionist/sort-imports */
+import 'src/global.css';
+
+import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
+
+import Router from 'src/routes/sections';
+import ThemeProvider from 'src/theme';
+
+// ----------------------------------------------------------------------
 
 export default function App() {
-
-  axios.defaults.baseURL = "http://localhost:8081";
+  useScrollToTop();
 
   return (
-    
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Index />} />
-        <Route path="/add" element={<RequireAuth loginPath="/login"><Add/></RequireAuth>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/setting" element={<RequireAuth loginPath="/login"><Setting/></RequireAuth>}/>
-      </Route>
-    </Routes>
-
-  )
+    <ThemeProvider>
+      <Router />
+    </ThemeProvider>
+  );
 }
-

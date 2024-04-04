@@ -1,24 +1,30 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import { AuthProvider } from "react-auth-kit"
-import { BrowserRouter } from "react-router-dom"
-import { ReactNotifications } from 'react-notifications-component'
+import { Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { Auth0Provider } from '@auth0/auth0-react';
 
+import App from './app';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <AuthProvider
-      authType="cookie"
-      authName="_auth"
-      cookieDomain={window.location.hostname}
-      cookieSecure={false}>
-      <BrowserRouter>
-        <ReactNotifications />
-        <App />
-      </BrowserRouter>
-    </AuthProvider>
+// ----------------------------------------------------------------------
 
-  </React.StrictMode>,
-)
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  
+  <Auth0Provider
+  domain="localhost"
+  clientId="XqeGMydqwS3g7sWMmZgQhHJ1oebImmE2"
+  authorizationParams={{
+    redirect_uri: window.location.origin
+  }}
+  >
+    <HelmetProvider>
+        <BrowserRouter>
+          <Suspense>
+            <App />
+          </Suspense>
+        </BrowserRouter>
+    </HelmetProvider>
+  </Auth0Provider>
+);
