@@ -36,3 +36,5 @@ new-client/npm-debug.log*
 new-client/yarn-debug.log*
 new-client/yarn-error.log*
 new-client/.yarn/
+new-server/target/
+new-server/Cargo.lock
