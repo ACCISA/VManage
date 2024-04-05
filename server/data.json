@@ -1,0 +1,12 @@
+{
+    "settings": {
+        "path": "asas"
+    },
+    "machines": [
+        {
+            "name":"protostar",
+            "path":"/some/path",
+            "ip":"192.168.17.137"
+        }
+    ]
+}
