@@ -38,3 +38,7 @@ client/yarn-error.log*
 client/.yarn/
 server/target/
 server/Cargo.lock
+socket/__pycache__
+socket/server/__pycache__
+socket/venv/
+vmware_tools.egg-info/

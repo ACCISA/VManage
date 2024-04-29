@@ -6,12 +6,29 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { fShortenNumber } from 'src/utils/format-number';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 export default function AppWidgetListVMs({ color = 'primary', sx, ...other }) {
+  
+  const [socketState, setSocketState] = useState("")
+
+  const handleClick = () => {
+    // const socket = io("localhost:5000/", {
+    //   transports:['websocket'],
+    //   cors: {
+    //     origin:"http://localhost:3000/"
+    //   }
+    // })
+    // setSocketState(socket)
+
+    // socket.on('list_vms',)
+  }
+  
   return (
     <Card
+      onClick={handleClick}
       component={Stack}
       spacing={3}
       direction="row"
