@@ -64,10 +64,13 @@ class VMwareTools():
         if paths[len(paths)-1] == '': paths.pop(len(paths)-1)
         logging.info(paths) #todo remove /r found in paths
 
+    def validate_vmx(vmx_path):
+        if not os.path.exists(self.vmrun_path): return False
+        _, file_ext = os.path.splittext(vmrun_path)
+        if not file_ext == "vmx": return False
+        return True
 
     def start_vm(vmx_path):
-        if not os.path.exists(self.vmrun_path): raise Exception()
-        _, file_ext = os.path.splittext(vmrun_path)
-        if not file_ext == "vmx": raise Exception()
+        
         self.execute({"start":vmx_path})
         return

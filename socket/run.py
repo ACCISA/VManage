@@ -40,6 +40,13 @@ async def event_list_vms():
 
 async def event_start_vm(vmx_path: str):
 
+    yield sse_format({"status":"VALIDATING_VMX"})
+
+    is_valid = manager.validate_vmx(vmx_path)
+    if not is_valid:
+        yield sse_format({"status":"INVALID_VMX"})
+        return
+
     yield sse_format({"status":"STARTING_VM"})
     result = await manager.start_vm():
     yield sse_format({"status":"VM_STARTED"})
