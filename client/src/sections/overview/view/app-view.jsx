@@ -31,7 +31,7 @@ export default function AppView() {
         Your Machines
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{display: "flex", alignItems: "stretch"}}>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetListVMs/>
         </Grid>

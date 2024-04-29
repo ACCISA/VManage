@@ -11,12 +11,12 @@ import { RouterLink } from 'src/routes/components';
 
 const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const theme = useTheme();
-
-  const PRIMARY_LIGHT = theme.palette.primary.light;
-
-  const PRIMARY_MAIN = theme.palette.primary.main;
-
   const PRIMARY_DARK = theme.palette.primary.dark;
+
+  const PRIMARY_LIGHT = PRIMARY_DARK;
+
+  const PRIMARY_MAIN = PRIMARY_DARK;
+
 
   // OR using local (public folder)
   // -------------------------------------------------------

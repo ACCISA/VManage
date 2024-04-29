@@ -4,7 +4,7 @@ import { alpha, styled } from '@mui/material/styles';
 // ----------------------------------------------------------------------
 
 export const StyledLabel = styled(Box)(({ theme, ownerState }) => {
-  const lightMode = theme.palette.mode === 'light';
+  const lightMode = false;
 
   const filledVariant = ownerState.variant === 'filled';
 
@@ -16,7 +16,7 @@ export const StyledLabel = styled(Box)(({ theme, ownerState }) => {
     ...(ownerState.color === 'default' && {
       // FILLED
       ...(filledVariant && {
-        color: lightMode ? theme.palette.common.white : theme.palette.grey[800],
+        color: theme.palette.grey[800],
         backgroundColor: theme.palette.text.primary,
       }),
       // OUTLINED

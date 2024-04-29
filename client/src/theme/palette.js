@@ -104,7 +104,7 @@ const base = {
 export function palette() {
   return {
     ...base,
-    mode: 'light',
+    mode: 'dark',
     text: {
       primary: grey[800],
       secondary: grey[600],
