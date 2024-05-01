@@ -83,7 +83,7 @@ export default function Machine({ title, subheader, ...other }) {
       if (data.status === "NOT_RUNNING"){
         setWaitStart(false);
         setError(true);
-        setIsOnline(false);
+        setIsOnline(false); 
         setErrorMessage(errorMessages[1])
         sse.close();
       }

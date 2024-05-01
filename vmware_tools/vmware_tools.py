@@ -20,11 +20,12 @@ class VMwareTools():
 
         self.validate_vmrun()
 
-    def validate_vmrun(self):
-        if VMwareTools.vmrun_path is None: raise Exception()
-        if not os.path.exists(VMwareTools.vmrun_path): raise Exception()
-        if os.path.basename(VMwareTools.vmrun_path) != "vmrun" and os.path.basename(VMwareTools.vmrun_path) != "vmrun.exe": raise Exception()
+    def validate_vmrun(self) -> bool:
+        if VMwareTools.vmrun_path is None: return False
+        if not os.path.exists(VMwareTools.vmrun_path): return False
+        if os.path.basename(VMwareTools.vmrun_path) != "vmrun" and os.path.basename(VMwareTools.vmrun_path) != "vmrun.exe": raise False
         logging.info("using vmrun path: "+VMwareTools.vmrun_path)
+        return True
         # this does not prevent people from executing other executables then vmrun, this is just to prevent errors in the library
 
     async def execute(commands: dict = {}):

@@ -116,3 +116,13 @@ async def handle_start_import(vmx_path: str = Query(...)):
 @app.get("/stop_vm")
 async def handle_stop_vm(vmx_path: str = Query(...)):
     return StreamingResponse(event_stop_vm(vmx_path), media_type='text/event-stream')
+
+@app.get("/set_vmrun")
+async def handle_set_vmrun(vmrun_path: str = Query(...)):
+    is_valid = VMwareTools.validate_vmrun()
+    if not is_valid:
+        logging.warning("invalid vmrun provided")
+        return {"status":False}
+    VMwareTools.vmrun_path = vmrun_path
+    return {"status":True}
+        
