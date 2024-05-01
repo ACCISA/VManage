@@ -5,7 +5,9 @@ import Stack from '@mui/material/Stack';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
+import threedot from "../overview/threedot.css"
 
+import { Oval } from 'react-loader-spinner';
 import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
 
@@ -18,11 +20,82 @@ export default function Machine({ title, subheader, ...other }) {
   const [ ip , setIp ] = useState("192.168.17.137");
   const [ os, setOs ] = useState("Ubuntu");
   const [ lastOnline, setLastOnline ] = useState("4/3/2024")
+  const [ waitStart, setWaitStart ] = useState(false);
+  const [ waitPing, setWaitPing ] = useState(false);
+  const [ waitInstall, setWaitInstall ] = useState(false);
+  const [ waitEnter, setWaitEnter ] = useState(false);
+  const [ statusMessage, setStatusMessage ] = useState("");
+  const [ errorMessage, setErrorMessage ] = useState("");
+  const [ error, setError] = useState(false); 
+  const [ isOnline, setIsOnline ] = useState(false);
+
+  const statusMessages = ["Validating VMX file...","Starting Vritual Machine...","Stoping Virtual Machine..."]
+  const errorMessages = ["Invalid VMX Path","VM not running"]
 
   const handleEdit = () => {
     if (!edit) setEdit(true);
     if (edit) setEdit(false);
     
+  }
+
+  const handleStart = () => {
+    setError(false);
+    setErrorMessage("");
+    const sse = new EventSource('http://localhost:5005/start_vm?vmx_path='+subheader);
+    sse.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data)
+      if (data.status === "VALIDATING_VMX"){
+        setStatusMessage(statusMessages[0]);
+        setWaitStart(true);
+      }
+      if (data.status === "INVALID_VMX"){
+        setWaitStart(false);
+        setError(true);
+        setErrorMessage(errorMessages[0]);
+        sse.close();
+      }
+      if (data.status === "STARTING_VM"){
+        setStatusMessage(statusMessages[1]);
+        console.log("sssdd")
+      }
+      if (data.status === "VM_STARTED") {
+        setWaitStart(false);
+        setIsOnline(true);
+        sse.close();
+      }
+    }
+  }
+
+  const handleStop = () => {  
+    setError(false);
+    setErrorMessage("");
+    const sse = new EventSource('http://localhost:5005/stop_vm?vmx_path='+encodeURIComponent(subheader))
+    sse.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data)
+      if (data.status === "INVALID_VMX"){
+        setWaitStart(false);
+        setError(true);
+        setErrorMessage(errorMessages[0]);
+        sse.close();
+      }
+      if (data.status === "NOT_RUNNING"){
+        setWaitStart(false);
+        setError(true);
+        setIsOnline(false);
+        setErrorMessage(errorMessages[1])
+        sse.close();
+      }
+      if (data.status === "STOPING_VM"){
+        setStatusMessage(statusMessages[2]);
+      }
+      if (data.status == "VM_STOPPED"){
+        setWaitStart(false);
+        setIsOnline(false);
+        sse.close();
+      }
+    }
   }
 
   const subheaderCmpnt = (
@@ -37,7 +110,6 @@ export default function Machine({ title, subheader, ...other }) {
   return (
 
     <Card {...other}>
-      
       <Box sx={{ alignItems: "center", pb: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
         <div style={{ marginTop: 4,  alignItems: "center", display: "flex", flexDirection: "row" }}>
           <img style={{ marginTop: 12, marginLeft: 12, width: "4em", height: "4em" }} alt="icon" src="/assets/icons/glass/ic_ubuntu.png" />
@@ -49,7 +121,7 @@ export default function Machine({ title, subheader, ...other }) {
           </svg>
         </Button>
       </Box>
-      <Card sx={{ border: "1px solid red", justifyContent: "space-around", display: 'flex', flexDirection: 'row', backgroundColor: "#D3D3D3", marginLeft: 4, marginRight: 4, marginTop: 2, padding: 2, }}>
+      <Card sx={{ border: !isOnline ? "1px solid red" : "1px solid green", justifyContent: "space-around", display: 'flex', flexDirection: 'row', backgroundColor: "#D3D3D3", marginLeft: 4, marginRight: 4, marginTop: 2, padding: 2, }}>
         <Stack sx={{marginRight: 4}} spacing={0.5}>
           <Typography variant="h6">Status</Typography>
           <Typography variant="subtitle2" sx={{ color: 'text.disabled' }}>
@@ -79,12 +151,37 @@ export default function Machine({ title, subheader, ...other }) {
       </Card>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
         <Box>
-          <Button sx={{ margin: 2 }}>
-            <svg style={{ marginRight: 1, width: "1.5em", height: "1.5em" }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          {!isOnline && <Button onClick={handleStart} sx={{ margin: 2 }}> 
+            {!waitStart && <svg style={{ marginRight: 1, width: "1.5em", height: "1.5em" }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
-            </svg>
+            </svg>}
+            {waitStart && <Oval
+              sx={{ marginRight: 2}}
+              height="1.5em"
+              width="1.5em"
+              color="#4fa94d"
+              ariaLabel="oval-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />}
             Start
-          </Button>
+          </Button>}
+          {isOnline && <Button onClick={handleStop} sx={{ margin: 2 }}> 
+            {!waitStart && <svg style={{ marginRight: 1, width: "1.5em", height: "1.5em" }}  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
+            </svg>
+            }
+            {waitStart && <Oval
+              sx={{ marginRight: 2}}
+              height="1.5em"
+              width="1.5em"
+              color="#4fa94d"
+              ariaLabel="oval-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />}
+            Stop
+          </Button>}
           <Button sx={{ margin: 2 }}>
             <svg style={{ marginRight: 1, width: "1.5em", height: "1.5em" }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
@@ -98,6 +195,8 @@ export default function Machine({ title, subheader, ...other }) {
             Edit
           </Button>
         </Box>
+        {waitStart && <h4 className='loading'>{statusMessage}</h4>}
+        {error && <h4 style={{color: "red"}}>{errorMessage}</h4>}
         <Box>
           <Button sx={{ margin: 2 }}>
             <svg style={{ marginRight: 1, width: "1.5em", height: "1.5em" }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -119,8 +218,6 @@ export default function Machine({ title, subheader, ...other }) {
           </Button>
         </Box>
       </Box>
-      
-
     </Card>
     
   );

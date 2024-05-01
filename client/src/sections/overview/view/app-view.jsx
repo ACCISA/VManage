@@ -15,7 +15,7 @@ import Machine from '../app-machine';
 import AppWidgetListVMs from '../app-widget-list-vms';
 import AppWidgetDir from '../app-widget-dir';
 import AppWidgetRun from '../app-widget-run';
-import AppWidgetNetwork from '../app-widget-network';
+import AppWidgetImport from '../app-widget-import';
 
 
 import AppTrafficBySite from '../app-traffic-by-site';
@@ -37,7 +37,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
-          <AppWidgetDir/>
+          <AppWidgetImport/>
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
@@ -45,13 +45,13 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
-          <AppWidgetNetwork/>
+          <AppWidgetDir/>
         </Grid>
 
         <Grid xs={12} md={6} lg={12}>
           <Machine
             title="Ubuntu-Server 20.04"
-            subheader="C:\Users\darra\OneDrive\Documents\ubuntu.vmx"
+            subheader="D:\metasploitable\metasploitable-linux-2.0.0\Metasploitable2-Linux\Metaspoitable.vmx"
           />
         </Grid>
         <Grid xs={12} md={6} lg={12}>
