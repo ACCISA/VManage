@@ -37,7 +37,8 @@ async def event_generator():
 async def event_list_vms():
 
     yield sse_format({"status":"STARTING_LIST_VMS"})
-    result = await manager.list_running()
+    result = await VMwareTools.list_running()
+    await asyncio.sleep(2)
     yield sse_format({"status":"COMPLETED_LIST_VMS","result":result})
 
 async def event_start_vm(vmx_path: str):

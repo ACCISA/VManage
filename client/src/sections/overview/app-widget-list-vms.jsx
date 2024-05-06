@@ -8,15 +8,40 @@ import Typography from '@mui/material/Typography';
 import { fShortenNumber } from 'src/utils/format-number';
 import { useEffect, useState } from 'react';
 
+import AppPopupListVms from './popup/app-popup-list-vms';
+
 // ----------------------------------------------------------------------
 
 export default function AppWidgetListVMs({ color = 'primary', sx, ...other }) {
   
-  const [socketState, setSocketState] = useState("");
   const [waiting, setWaiting] = useState(false);
+  const [ open, setOpen ] = useState(false);
+  const [ machines, setMachines ] = useState([
+    {
+      machineName: "machine 1",
+      vmxPath: "C:/Path/To/Machine/machine1.vmx",
+      os: "Ubuntu",
+      ip: "192.168.17.107"
+    },
+    {
+      machineName: "machine 2",
+      vmxPath: "C:/Path/To/Machine/machine2.vmx",
+      os: "Ubuntu",
+      ip: "192.168.17.102"
+    },
+    {
+      machineName: "machine 3",
+      vmxPath: "C:/Path/To/Machine/machine3.vmx",
+      os: "Ubuntu",
+      ip: "192.168.17.102"
+    }
+  ]);
 
   const handleClick = () => {
-    console.log('clicked')
+
+    if (open) return; // prevent widget from being triggered outside the Modal
+
+    setOpen(true);
     const sse = new EventSource('http://localhost:5005/list_vms');
 
     sse.onmessage = (event) => {
@@ -31,8 +56,6 @@ export default function AppWidgetListVMs({ color = 'primary', sx, ...other }) {
         sse.close();
       }
     }
-
-
   }
 
   return (
@@ -63,14 +86,7 @@ export default function AppWidgetListVMs({ color = 'primary', sx, ...other }) {
         List all running machines
         </Typography>
       </Stack>
-      {/* <Oval
-        height="40"
-        width="40"
-        color="#4fa94d"
-        ariaLabel="oval-loading"
-        wrapperStyle={{}}
-        wrapperClass=""
-      /> */}
+      <AppPopupListVms open={open} setOpen={setOpen} waiting={waiting} machines={machines}/>
     </Card>
   );
 }
