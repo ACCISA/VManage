@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import asyncio
 import json
 import sys
@@ -21,6 +22,11 @@ app.add_middleware(
 
 VMwareTools.vmrun_path = "C:\\Program Files (x86)\\VMware\\VMware Player\\vmrun.exe"
 manager = VManager()
+
+class LoginAttempt(BaseModel):
+    username: str
+    password: str
+
 
 def sse_format(data):
         json_data = json.dumps(data)
@@ -126,4 +132,27 @@ async def handle_set_vmrun(vmrun_path: str = Query(...)):
         return {"status":False}
     VMwareTools.vmrun_path = vmrun_path
     return {"status":True}
-        
+
+@app.post("/auth")
+async def handle_auth(login_attempt: LoginAttempt):
+    if not (login_attempt.username and login_attempt.password): return {"status":False}
+    if login_attempt.username != "vmanage" and login_attempt.password != "vmanage": return {"status":False}
+    machines = [{
+        "machineName": "machine 1",
+        "vmxPath": "C:/Path/To/Machine/machine1.vmx",
+        "os": "Ubuntu",
+        "ip": "192.168.17.107"
+      },
+      {
+        "machineName": "machine 2",
+        "vmxPath": "C:/Path/To/Machine/machine2.vmx",
+        "os": "Ubuntu",
+        "ip": "192.168.17.102"
+      },
+      {
+        "machineName": "machine 3",
+        "vmxPath": "C:/Path/To/Machine/machine3.vmx",
+        "os": "Ubuntu",
+        "ip": "192.168.17.102"
+      }]
+    return {"status":True,"machines":machines}

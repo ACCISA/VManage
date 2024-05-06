@@ -16,7 +16,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
-import { useAuth0 } from "@auth0/auth0-react";
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -28,7 +27,6 @@ export default function LoginView() {
 
   const router = useRouter();
 
-  const { loginWithRedirect } = useAuth0();
 
   const [showPassword, setShowPassword] = useState(false);
 
